@@ -30,6 +30,7 @@ FRAME_PROCESSORS_METHODS =\
 	'post_process'
 ]
 
+
 def load_frame_processor_module(frame_processor : str) -> Any:
 	print(frame_processor)
 	try:

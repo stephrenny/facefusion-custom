@@ -135,8 +135,7 @@ def register_args(program : ArgumentParser) -> None:
 	program.add_argument('--face-swapper-model', help = wording.get('frame_processor_model_help'), default = 'inswapper_128', choices = frame_processors_choices.face_swapper_models)
 
 
-def apply_args(program : ArgumentParser) -> None:
-	args = program.parse_args()
+def apply_args(args) -> None:
 	frame_processors_globals.face_swapper_model = args.face_swapper_model
 	if args.face_swapper_model == 'blendswap_256':
 		facefusion.globals.face_recognizer_model = 'arcface_blendswap'

@@ -102,26 +102,20 @@ def cli(prebuilt_args=None) -> None:
 
 
 def apply_args(program : ArgumentParser, prebuilt_args=None) -> None:
-	print("Trying to apply new args")
-	print(prebuilt_args)
 	args = program.parse_args() if not prebuilt_args else program.parse_args(prebuilt_args)
-	print(args)
 	# general
 	facefusion.globals.source_paths = args.source_paths
 	facefusion.globals.target_path = args.target_path
 	facefusion.globals.output_path = normalize_output_path(facefusion.globals.source_paths, facefusion.globals.target_path, args.output_path)
-	print("Done with general")
 	# misc
 	facefusion.globals.skip_download = args.skip_download
 	facefusion.globals.headless = args.headless
 	facefusion.globals.log_level = "info"
-	print("Done with misc")
 	# execution
 	facefusion.globals.execution_providers = decode_execution_providers(args.execution_providers)
 	facefusion.globals.execution_thread_count = args.execution_thread_count
 	facefusion.globals.execution_queue_count = args.execution_queue_count
 	facefusion.globals.max_memory = args.max_memory
-	print("Done with execution")
 	# face analyser
 	facefusion.globals.face_analyser_order = args.face_analyser_order
 	facefusion.globals.face_analyser_age = args.face_analyser_age
@@ -139,7 +133,6 @@ def apply_args(program : ArgumentParser, prebuilt_args=None) -> None:
 	facefusion.globals.face_mask_blur = args.face_mask_blur
 	facefusion.globals.face_mask_padding = normalize_padding(args.face_mask_padding)
 	facefusion.globals.face_mask_regions = args.face_mask_regions
-	print("Done with face mask")
 	# frame extraction
 	facefusion.globals.trim_frame_start = args.trim_frame_start
 	facefusion.globals.trim_frame_end = args.trim_frame_end
@@ -152,24 +145,18 @@ def apply_args(program : ArgumentParser, prebuilt_args=None) -> None:
 	facefusion.globals.output_video_quality = args.output_video_quality
 	facefusion.globals.keep_fps = args.keep_fps
 	facefusion.globals.skip_audio = args.skip_audio
-	print("Done with output creation")
 	# frame processors
 	available_frame_processors = list_module_names('facefusion/processors/frame/modules')
-	print("Done listing processor names")
 	facefusion.globals.frame_processors = args.frame_processors
 	for frame_processor in available_frame_processors:
 		frame_processor_module = load_frame_processor_module(frame_processor)
-		frame_processor_module.apply_args(program)
-		print("Loaded a module")
-	print("Done with processors")
+		frame_processor_module.apply_args(args)
 	# uis
 	facefusion.globals.ui_layouts = args.ui_layouts
-	print("Done applying args")
 
 def run(program : ArgumentParser, prebuilt_args=None) -> None:
 	apply_args(program, prebuilt_args)
 	logger.init(facefusion.globals.log_level)
-	print("Limiting resources")
 	limit_resources()
 	if not pre_check() or not content_analyser.pre_check() or not face_analyser.pre_check() or not face_masker.pre_check():
 		return
@@ -177,7 +164,6 @@ def run(program : ArgumentParser, prebuilt_args=None) -> None:
 		if not frame_processor_module.pre_check():
 			return
 	if facefusion.globals.headless:
-		print("Running headless")
 		conditional_process()
 	else:
 		import facefusion.uis.core as ui
