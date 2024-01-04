@@ -20,7 +20,6 @@ model_urls = [
 
 install_commands = [
     "python install.py --torch cuda --onnxruntime cuda --skip-venv",
-    # "cd /usr/local/lib/python3.10/dist-packages/torch/lib && ln -s libnvrtc-672ee683.so.11.2 libnvrtc.so",
 ]
 
 def download_models():
@@ -41,7 +40,7 @@ image = (
 )
 
 vol = Volume.persisted("alias-sources")
-stub = Stub("alias-faceswap-endpoint-dev-2", image=image)
+stub = Stub("alias-faceswap-endpoint-prod-v1", image=image)
 
 @stub.function(secret=Secret.from_name("aws-s3-secret"), volumes={"/face-sources": vol}, gpu=gpu.A100(memory=16))
 @web_endpoint(method="POST")
