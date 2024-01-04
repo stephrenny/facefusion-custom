@@ -42,7 +42,7 @@ image = (
 vol = Volume.persisted("alias-sources")
 stub = Stub("alias-faceswap-endpoint-prod-v1", image=image)
 
-@stub.function(secret=Secret.from_name("aws-s3-secret"), volumes={"/face-sources": vol}, gpu=gpu.A100(memory=16))
+@stub.function(secret=Secret.from_name("aws-s3-secret"), gpu=gpu.A100(), volumes={"/face-sources": vol})
 @web_endpoint(method="POST")
 async def swap_face(user_id: Optional[str] = Form(None), 
               source_image_id: str = Form(...), 
