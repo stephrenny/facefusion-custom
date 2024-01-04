@@ -20,7 +20,7 @@ model_urls = [
 
 install_commands = [
     "python install.py --torch cuda --onnxruntime cuda --skip-venv",
-    "cd /usr/local/lib/python3.10/dist-packages/torch/lib && ln -s libnvrtc-672ee683.so.11.2 libnvrtc.so",
+    # "cd /usr/local/lib/python3.10/dist-packages/torch/lib && ln -s libnvrtc-672ee683.so.11.2 libnvrtc.so",
 ]
 
 def download_models():
@@ -29,15 +29,16 @@ def download_models():
 
 image = (
     Image.debian_slim()
-    .apt_install("python3.10 -y", "python-is-python3 -y", "pip -y", "git -y", "curl -y", "ffmpeg -y")
+    .apt_install("python3.10", "python-is-python3", "pip", "git", "curl", "ffmpeg")
     .workdir("/facefusion-custom")
-    .run_commands("git clone https://github.com/stephrenny/facefusion-custom.git --branch master --single-branch .")
+    .run_commands("git clone https://github.com/stephrenny/facefusion-custom .")
     .run_commands(install_commands)
-    .workdir('/facefusion-custom')
     .pip_install(["Pillow", "boto3"])
     .run_function(download_models)
-    .run_commands("git pull origin master", force_build=True) # For dev purposes
-    )
+    .workdir('facefusion-custom')
+    .run_commands("git pull", force_build=True)
+    
+)
 
 vol = Volume.persisted("alias-sources")
 stub = Stub("alias-faceswap-endpoint-dev-2", image=image)
