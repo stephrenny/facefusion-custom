@@ -28,7 +28,7 @@ def download_models():
 
 image = (
     Image.debian_slim()
-    .apt_install("python3.10", "python-is-python3", "pip", "git", "curl", "ffmpeg")
+    .apt_install("python3.10", "python-is-python3", "pip", "git", "curl", "ffmpeg", force_build=True)
     .workdir("/facefusion-custom")
     .run_commands("git clone https://github.com/stephrenny/facefusion-custom .")
     .run_commands(install_commands)
@@ -42,7 +42,7 @@ image = (
 vol = Volume.persisted("alias-sources")
 stub = Stub("alias-faceswap-endpoint-prod-v1", image=image)
 
-@stub.function(secret=Secret.from_name("aws-s3-secret"), gpu=gpu.T4(memory=16), volumes={"/face-sources": vol})
+@stub.function(secret=Secret.from_name("aws-s3-secret"), gpu=gpu.T4(), volumes={"/face-sources": vol})
 @web_endpoint(method="POST")
 async def swap_face(user_id: Optional[str] = Form(None), 
               source_image_id: str = Form(...), 
