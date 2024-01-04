@@ -28,7 +28,9 @@ def download_models():
     conditional_download(download_directory_path, model_urls)
 
 image = (
-    Image.from_dockerfile("Dockerfile.cuda")
+    Image.debian_slim()
+    .apt_install("python3.10 -y", "python-is-python3 -y", "pip -y", "git -y", "curl -y", "ffmpeg -y")
+    .workdir("/facefusion-custom")
     .run_commands("git clone https://github.com/stephrenny/facefusion-custom.git --branch master --single-branch .")
     .run_commands(install_commands)
     .workdir('/facefusion-custom')
