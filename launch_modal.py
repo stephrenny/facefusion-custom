@@ -19,7 +19,7 @@ model_urls = [
 ]
 
 def download_models():
-    download_directory_path = ('/facefusion/.assets/models') # remove hardcode
+    download_directory_path = ('/facefusion-custom/.assets/models') # remove hardcode
     conditional_download(download_directory_path, model_urls)
 
 image = Image.from_dockerfile("Dockerfile.cuda").pip_install(["Pillow", "boto3"]).run_function(download_models)
@@ -46,7 +46,7 @@ async def swap_face(user_id: Optional[str] = Form(None),
     vol.reload()
 
     # Directory setup
-    os.chdir("/facefusion")
+    os.chdir("/facefusion-custom")
     targets_dir = Path("tmp/targets")
     outputs_dir = Path("tmp/outputs")
     
