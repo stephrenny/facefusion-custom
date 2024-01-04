@@ -30,13 +30,15 @@ FRAME_PROCESSORS_METHODS =\
 	'post_process'
 ]
 
-
 def load_frame_processor_module(frame_processor : str) -> Any:
 	print(frame_processor)
 	try:
 		print("trying to find module")
 		frame_processor_module = importlib.import_module('facefusion.processors.frame.modules.' + frame_processor)
+		print("imported module")
 		for method_name in FRAME_PROCESSORS_METHODS:
+			print("module method")
+			print(method_name)
 			if not hasattr(frame_processor_module, method_name):
 				raise NotImplementedError
 	except ModuleNotFoundError as exception:
@@ -44,6 +46,8 @@ def load_frame_processor_module(frame_processor : str) -> Any:
 		sys.exit(wording.get('frame_processor_not_loaded').format(frame_processor = frame_processor))
 	except NotImplementedError:
 		sys.exit(wording.get('frame_processor_not_implemented').format(frame_processor = frame_processor))
+	
+	print("Loaded module")
 	return frame_processor_module
 
 
