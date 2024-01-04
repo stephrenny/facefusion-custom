@@ -102,7 +102,7 @@ def cli() -> None:
 
 
 def apply_args(program : ArgumentParser) -> None:
-	args = program.parse_args()
+	args = program.parse_known_args()
 	# general
 	facefusion.globals.source_paths = args.source_paths
 	facefusion.globals.target_path = args.target_path
