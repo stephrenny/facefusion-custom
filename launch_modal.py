@@ -43,7 +43,7 @@ image = (
 vol = Volume.persisted("alias-sources")
 stub = Stub("alias-faceswap-endpoint-dev-2", image=image)
 
-@stub.function(secret=Secret.from_name("aws-s3-secret"), volumes={"/face-sources": vol}, gpu=gpu.T4())
+@stub.function(secret=Secret.from_name("aws-s3-secret"), volumes={"/face-sources": vol}, gpu=gpu.A100(memory=16))
 @web_endpoint(method="POST")
 async def swap_face(user_id: Optional[str] = Form(None), 
               source_image_id: str = Form(...), 
@@ -106,6 +106,7 @@ async def swap_face(user_id: Optional[str] = Form(None),
     '-s', str(source_filename),
     '-t', str(target_filename),
     '-o', str(output_filename),
+    '--execution-providers', 'cuda',
     '--headless'
     ]
     core.cli(args)
