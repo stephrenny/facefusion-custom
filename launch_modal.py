@@ -1,4 +1,4 @@
-from modal import Image, Stub, Secret, Volume, web_endpoint
+from modal import Image, Stub, Secret, Volume, web_endpoint, gpu
 from facefusion.download import conditional_download
 from fastapi import UploadFile, File, Form, HTTPException
 from typing import Optional
@@ -43,7 +43,7 @@ image = (
 vol = Volume.persisted("alias-sources")
 stub = Stub("alias-faceswap-endpoint-dev-2", image=image)
 
-@stub.function(secret=Secret.from_name("aws-s3-secret"), volumes={"/face-sources": vol})
+@stub.function(secret=Secret.from_name("aws-s3-secret"), volumes={"/face-sources": vol}, gpu=gpu.T4())
 @web_endpoint(method="POST")
 async def swap_face(user_id: Optional[str] = Form(None), 
               source_image_id: str = Form(...), 
@@ -55,6 +55,7 @@ async def swap_face(user_id: Optional[str] = Form(None),
     import uuid
     from pathlib import Path
     from facefusion import core
+    import torch
 
     s3 = boto3.client("s3")
     bucket_name = 'faceswap-outputs'
@@ -97,6 +98,8 @@ async def swap_face(user_id: Optional[str] = Form(None),
 
     # Reserve a filename for the output
     output_filename = outputs_dir / f"{uuid.uuid4()}.jpeg"
+
+    print("Is cuda available", torch.cuda.is_available())
     
     # Run facefusion
     args = [
@@ -105,7 +108,6 @@ async def swap_face(user_id: Optional[str] = Form(None),
     '-o', str(output_filename),
     '--headless'
     ]
-    
     core.cli(args)
 
     # Upload the file
