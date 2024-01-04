@@ -18,20 +18,24 @@ model_urls = [
     "https://github.com/facefusion/facefusion-assets/releases/download/models/real_esrgan_x2plus.pth",
 ]
 
-clone_repo_commands = [
-    "git clone https://github.com/stephrenny/facefusion-custom.git --branch master --single-branch ."
-]
-
 install_commands = [
-    "RUN python install.py --torch cuda --onnxruntime cuda --skip-venv",
-    "RUN cd /usr/local/lib/python3.10/dist-packages/torch/lib && ln -s libnvrtc-672ee683.so.11.2 libnvrtc.so",
+    "python install.py --torch cuda --onnxruntime cuda --skip-venv",
+    "cd /usr/local/lib/python3.10/dist-packages/torch/lib && ln -s libnvrtc-672ee683.so.11.2 libnvrtc.so",
 ]
 
 def download_models():
     download_directory_path = ('/facefusion-custom/.assets/models') # remove hardcode
     conditional_download(download_directory_path, model_urls)
 
-image = Image.from_dockerfile("Dockerfile.cuda").run_commands(clone_repo_commands, force_build=True).run_commands(install_commands).pip_install(["Pillow", "boto3"]).run_function(download_models)
+image = (
+    Image.from_dockerfile("Dockerfile.cuda")
+    .run_commands("git clone https://github.com/stephrenny/facefusion-custom.git --branch master --single-branch .")
+    .run_commands(install_commands)
+    .workdir('/facefusion-custom')
+    .pip_install(["Pillow", "boto3"])
+    .run_function(download_models)
+    .run_commands("git pull origin master", force_build=True) # For dev purposes
+    )
 
 vol = Volume.persisted("alias-sources")
 stub = Stub("alias-faceswap-endpoint-dev-2", image=image)
@@ -102,6 +106,8 @@ async def swap_face(user_id: Optional[str] = Form(None),
     print(args)
     
     core.cli(args)
+
+    print("Done running")
 
     # Upload the file
     aws_filename = f"{uuid.uuid4()}.jpeg"

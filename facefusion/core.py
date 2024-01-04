@@ -156,10 +156,12 @@ def apply_args(program : ArgumentParser, prebuilt_args=None) -> None:
 		frame_processor_module.apply_args(program)
 	# uis
 	facefusion.globals.ui_layouts = args.ui_layouts
+	print("Done applying args")
 
 def run(program : ArgumentParser, prebuilt_args=None) -> None:
 	apply_args(program, prebuilt_args)
 	logger.init(facefusion.globals.log_level)
+	print("Limiting resources")
 	limit_resources()
 	if not pre_check() or not content_analyser.pre_check() or not face_analyser.pre_check() or not face_masker.pre_check():
 		return
@@ -167,6 +169,7 @@ def run(program : ArgumentParser, prebuilt_args=None) -> None:
 		if not frame_processor_module.pre_check():
 			return
 	if facefusion.globals.headless:
+		print("Running headless")
 		conditional_process()
 	else:
 		import facefusion.uis.core as ui
@@ -280,6 +283,7 @@ def conditional_process() -> None:
 	for frame_processor_module in get_frame_processors_modules(facefusion.globals.frame_processors):
 		if not frame_processor_module.pre_process('output'):
 			return
+	print("Processing image")
 	if is_image(facefusion.globals.target_path):
 		process_image()
 	if is_video(facefusion.globals.target_path):
