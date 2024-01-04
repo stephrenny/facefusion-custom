@@ -35,9 +35,9 @@ image = (
     .run_commands(install_commands)
     .pip_install(["Pillow", "boto3"])
     .run_function(download_models)
+    .run_commands("pwd", force_build=True) # Dev purposes
     .workdir('facefusion-custom')
-    .run_commands("git pull", force_build=True)
-    
+    .run_commands("git pull")
 )
 
 vol = Volume.persisted("alias-sources")

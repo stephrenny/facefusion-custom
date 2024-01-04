@@ -155,10 +155,12 @@ def apply_args(program : ArgumentParser, prebuilt_args=None) -> None:
 	print("Done with output creation")
 	# frame processors
 	available_frame_processors = list_module_names('facefusion/processors/frame/modules')
+	print("Done listing processor names")
 	facefusion.globals.frame_processors = args.frame_processors
 	for frame_processor in available_frame_processors:
 		frame_processor_module = load_frame_processor_module(frame_processor)
 		frame_processor_module.apply_args(program)
+		print("Loaded a module")
 	print("Done with processors")
 	# uis
 	facefusion.globals.ui_layouts = args.ui_layouts
