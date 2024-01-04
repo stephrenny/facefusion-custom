@@ -105,12 +105,8 @@ async def swap_face(user_id: Optional[str] = Form(None),
     '-o', str(output_filename),
     '--headless'
     ]
-
-    print(args)
     
     core.cli(args)
-
-    print("Done running")
 
     # Upload the file
     aws_filename = f"{uuid.uuid4()}.jpeg"
