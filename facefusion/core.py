@@ -33,7 +33,7 @@ if platform.system().lower() == 'darwin':
 	ssl._create_default_https_context = ssl._create_unverified_context
 
 
-def cli() -> None:
+def cli(prebuilt_args=None) -> None:
 	signal.signal(signal.SIGINT, lambda signal_number, frame: destroy())
 	program = ArgumentParser(formatter_class = lambda prog: HelpFormatter(prog, max_help_position = 120), add_help = False)
 	# general
@@ -98,11 +98,11 @@ def cli() -> None:
 	# uis
 	group_uis = program.add_argument_group('uis')
 	group_uis.add_argument('--ui-layouts', help = wording.get('ui_layouts_help').format(choices = ', '.join(list_module_names('facefusion/uis/layouts'))), default = [ 'default' ], nargs = '+')
-	run(program)
+	run(program, prebuilt_args)
 
 
-def apply_args(program : ArgumentParser) -> None:
-	args = program.parse_known_args()
+def apply_args(program : ArgumentParser, prebuilt_args=None) -> None:
+	args = program.parse_args() if not prebuilt_args else program.parse_args(prebuilt_args)
 	# general
 	facefusion.globals.source_paths = args.source_paths
 	facefusion.globals.target_path = args.target_path
@@ -154,8 +154,8 @@ def apply_args(program : ArgumentParser) -> None:
 	# uis
 	facefusion.globals.ui_layouts = args.ui_layouts
 
-def run(program : ArgumentParser) -> None:
-	apply_args(program)
+def run(program : ArgumentParser, prebuilt_args=None) -> None:
+	apply_args(program, prebuilt_args)
 	logger.init(facefusion.globals.log_level)
 	limit_resources()
 	if not pre_check() or not content_analyser.pre_check() or not face_analyser.pre_check() or not face_masker.pre_check():

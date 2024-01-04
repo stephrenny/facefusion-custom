@@ -32,7 +32,6 @@ async def swap_face(user_id: Optional[str] = Form(None),
               source_image_id: str = Form(...), 
               target_image: UploadFile = File(...)):
     import os
-    import subprocess
     import boto3
     from PIL import Image
     import io
@@ -82,19 +81,15 @@ async def swap_face(user_id: Optional[str] = Form(None),
     # Reserve a filename for the output
     output_filename = outputs_dir / f"{uuid.uuid4()}.jpeg"
     
-    program = core.build_args(source_filename, target_filename, output_filename, cuda=False)
-
-    core.run(program)
+    # Run facefusion
+    args = [
+    '-s', str(source_filename),
+    '-t', str(target_filename),
+    '-o', str(output_filename),
+    '--headless'
+    ]
     
-    # # Run facefusion
-    # command = [
-    # 'python', 'run.py',
-    # '-s', str(source_filename),
-    # '-t', str(target_filename),
-    # '-o', str(output_filename),
-    # '--headless'
-    # ]
-    # subprocess.run(command, check=True, text=True)
+    core.cli(args)
 
     # Upload the file
     aws_filename = f"{uuid.uuid4()}.jpeg"
