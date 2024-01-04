@@ -102,7 +102,10 @@ def cli(prebuilt_args=None) -> None:
 
 
 def apply_args(program : ArgumentParser, prebuilt_args=None) -> None:
+	print("Trying to apply new args")
+	print(prebuilt_args)
 	args = program.parse_args() if not prebuilt_args else program.parse_args(prebuilt_args)
+	print(args)
 	# general
 	facefusion.globals.source_paths = args.source_paths
 	facefusion.globals.target_path = args.target_path
